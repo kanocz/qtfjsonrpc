@@ -1,6 +1,6 @@
 /*
  * FastCGI processing module for QT5
- * @autor Anton Skorokhod anton@nsl.cz
+ * @autor Anton Skorokhod <anton@nsl.cz>
  */
 
 #ifndef NNAMEDSERVICE_H

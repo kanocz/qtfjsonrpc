@@ -1,6 +1,6 @@
 /*
  * FastCGI processing module for QT5
- * @autor Anton Skorokhod anton@nsl.cz
+ * @autor Anton Skorokhod <anton@nsl.cz>
  */
 
 #include <QSocketNotifier>
