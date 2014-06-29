@@ -1,0 +1,20 @@
+Source: qtfjsonrpc
+Section: libs
+Priority: extra
+Maintainer: Anton Skorokhod <anton@nsl.cz>
+Build-Depends: debhelper (>= 9), qtbase5-dev, cdbs, libfcgi-dev
+Standards-Version: 3.9.5
+
+Package: qtfjsonrpc-dev
+Architecture: any
+Section: libdevel
+Depends: qtfjsonrpc0 (= ${binary:Version}), ${misc:Depends}
+Description: JsonRpc via fastcgi library for Qt5
+ Header files for development
+
+Package: libqtfjsonrpc0
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: JsonRpc via fastcgi library for Qt5
+ Libraty for fast and easy developing of APIs usig jsonRPC and QT5

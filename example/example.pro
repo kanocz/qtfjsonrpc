@@ -1,7 +1,7 @@
 QT       += core
 QT       -= gui
 
-TARGET = testP
+TARGET = qtfjsonrpc-example
 CONFIG   += console
 CONFIG   -= app_bundle
 
@@ -16,3 +16,8 @@ SOURCES += main.cpp \
 
 HEADERS += \
     testservice.h
+
+example.files = example.pro  main.cpp  testservice.cpp  testservice.h
+example.path = /usr/share/doc/qtfjsonrpc-dev/example
+
+INSTALLS += example

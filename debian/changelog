@@ -1,0 +1,5 @@
+qtfjsonrpc (0.1) network; urgency=medium
+
+  * Initial debian package.
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sun, 29 Jun 2014 21:24:11 +0200

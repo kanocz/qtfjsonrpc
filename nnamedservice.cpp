@@ -4,7 +4,7 @@
  */
 
 #include "nnamedservice.h"
-#include "fastcgi.h"
+#include "nfastcgi.h"
 
 #include <QMetaMethod>
 

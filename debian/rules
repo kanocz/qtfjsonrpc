@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+export QT_SELECT=qt5
+
+DEB_QMAKE_ARGS=buildall.pro
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/qmake.mk

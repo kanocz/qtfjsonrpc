@@ -9,7 +9,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-#include "fastcgi.h"
+#include "nfastcgi.h"
 
 NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, QObject *parent) : QObject(parent), m_notifier(0), m_serviceMetaType(serviceMetaType)
 {

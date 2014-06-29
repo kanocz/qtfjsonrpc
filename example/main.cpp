@@ -12,7 +12,7 @@
 #include <QVariantList>
 
 #include "nnamedservice.h"
-#include "fastcgi.h"
+#include "nfastcgi.h"
 #include "testservice.h"
 
 int main(int argc, char *argv[])
