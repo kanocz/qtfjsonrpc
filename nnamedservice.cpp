@@ -24,16 +24,14 @@ void NNamedService::parseMetaInfo()
         const QMetaMethod method = meta->method(id);
         if (method.methodType() == QMetaMethod::Slot &&
             method.access() == QMetaMethod::Public) {
-            QByteArray signature = method.methodSignature();
-            QByteArray methodName = signature.left(signature.indexOf('('));
-            m_methodHash.insert(methodName, id);
+            m_methodHash.insert(method.name(), id);
 
             QList<int> paramTypes;
-            paramTypes << QMetaType::type(method.typeName());
+            paramTypes << method.returnType();
 
-            foreach(QByteArray paramType, method.parameterTypes()) {
-                paramTypes << QMetaType::type(paramType);
-            }
+            for (int p = 0; p < method.parameterCount(); p++)
+                paramTypes << method.parameterType(p);
+
             m_paramHash[id] = paramTypes;
         }
     }
