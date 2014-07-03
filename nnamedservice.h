@@ -11,6 +11,7 @@
 #include <QHash>
 #include <QMap>
 #include <QVariant>
+#include <QException>
 
 class NNamedService : public QObject
 {
@@ -33,5 +34,32 @@ private:
 protected:
     QMap<QString,QVariant> params;
 };
+
+class NNamedServriceException : public QException
+{
+  protected:
+    int m_id, m_code;
+    QString m_message;
+
+  public:
+    static const int code_parseError = -32700;
+    static const int code_invalidRequest = -32600;
+    static const int code_methodNotFound = -32601;
+    static const int code_invalidParams = -32602;
+    static const int code_internalError = -32603;
+    static const int code_serverError = -32000;
+
+    void raise() const { throw *this; }
+    NNamedServriceException *clone() const { return new NNamedServriceException(*this); }
+
+    ~NNamedServriceException() throw() {}
+
+    NNamedServriceException(int code = -32000, QString message = QString(), int id = -1) : m_id(id), m_code(code), m_message(message) { }
+
+    int getId() { return m_id; }
+    int getCode() { return m_code; }
+    QString getMessage() { return m_message; }
+};
+
 
 #endif // NNAMEDSERVICE_H

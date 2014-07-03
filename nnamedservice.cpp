@@ -4,7 +4,6 @@
  */
 
 #include "nnamedservice.h"
-#include "nfastcgi.h"
 
 #include <QMetaMethod>
 
@@ -44,7 +43,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
 
     QByteArray b_method = method.toLatin1();
     if (!m_methodHash.contains(b_method))
-        throw NJsonRpcException(NJsonRpcException::code_methodNotFound, QString("Method '%1' not found").arg(method));
+        throw NNamedServriceException(NNamedServriceException::code_methodNotFound, QString("Method '%1' not found").arg(method));
 
     int metaId = -1;
     QList<int> paramTypes;
@@ -58,7 +57,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
     }
 
     if (metaId == -1)
-        throw NJsonRpcException(NJsonRpcException::code_invalidParams);
+        throw NNamedServriceException(NNamedServriceException::code_invalidParams);
 
     QVarLengthArray<void *, 10> parameters;
     parameters.reserve(paramTypes.count());
@@ -95,7 +94,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
     bool success =
         const_cast<NNamedService*>(this)->qt_metacall(QMetaObject::InvokeMetaMethod, metaId, parameters.data()) < 0;
     if (!success)
-        throw NJsonRpcException(NJsonRpcException::code_serverError, QString("process for method '%1' failed").arg(method));
+        throw NNamedServriceException(NNamedServriceException::code_serverError, QString("process for method '%1' failed").arg(method));
 
     // cleanup and result
     QVariant returnCopy(returnValue);

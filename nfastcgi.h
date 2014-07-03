@@ -40,7 +40,10 @@ class NFastCgiJob : public QRunnable
     int m_serviceMetaType;
 
     static const int MAX_REQUEST_SIZE = 16 * 1024 * 1024;
-  public:
+
+    const char *getJsonError(NNamedServriceException *e);
+
+public:
 
     char *request_ip;
 
@@ -49,33 +52,6 @@ class NFastCgiJob : public QRunnable
     NFastCgiJob(FCGX_Request *request, int serviceMetaType);
     ~NFastCgiJob();
     void run();
-};
-
-class NJsonRpcException : public QException
-{
-  private:
-    int m_code;
-    QString m_message;
-    bool m_hasMessage;
-    int m_id;
-
-  public:
-    static const int code_parseError = -32700;
-    static const int code_invalidRequest = -32600;
-    static const int code_methodNotFound = -32601;
-    static const int code_invalidParams = -32602;
-    static const int code_internalError = -32603;
-    static const int code_serverError = -32000;
-
-    const char *getJsonError();
-
-    void raise() const { throw *this; }
-    NJsonRpcException *clone() const { return new NJsonRpcException(*this); }
-
-    ~NJsonRpcException() throw() {}
-
-    NJsonRpcException(int code = -3200) : m_code(code), m_hasMessage(false), m_id(-1) { }
-    NJsonRpcException(int code, QString message, int id = -1) : m_code(code), m_id(id) { m_message = message; m_hasMessage = true;}
 };
 
 
