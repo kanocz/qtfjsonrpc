@@ -15,6 +15,7 @@ NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, QObject *parent)
 {
     // инициализация метаданных до создания потоков, чтобы потом не повредить данные
     NNamedService *serviceInit = static_cast<NNamedService *>(QMetaType::create(m_serviceMetaType));
+    Q_CHECK_PTR(serviceInit)
     serviceInit->parseMetaInfo();
     QMetaType::destroy(m_serviceMetaType, (void *) serviceInit);
 
