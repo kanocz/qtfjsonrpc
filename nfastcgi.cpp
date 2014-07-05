@@ -8,20 +8,21 @@
 #include <QByteArray>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QThread>
 
 #include "nfastcgi.h"
 
-NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, QObject *parent) : QObject(parent), m_notifier(0), m_serviceMetaType(serviceMetaType)
+NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, int threadCount = 0, QObject *parent) : QObject(parent), m_notifier(0), m_serviceMetaType(serviceMetaType)
 {
     // инициализация метаданных до создания потоков, чтобы потом не повредить данные
     NNamedService *serviceInit = static_cast<NNamedService *>(QMetaType::create(m_serviceMetaType));
-    Q_CHECK_PTR(serviceInit)
+    Q_CHECK_PTR(serviceInit);
     serviceInit->parseMetaInfo();
     QMetaType::destroy(m_serviceMetaType, (void *) serviceInit);
 
     // создание пула потоков
     jobsPool = new QThreadPool(this);
-    jobsPool->setMaxThreadCount(1024);
+    jobsPool->setMaxThreadCount(threadCount == 0 ? QThread::idealThreadCount() : threadCount);
 
     // инициализаяиц fastcgi и подключения сигнала к сокету
     FCGX_Init();

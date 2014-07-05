@@ -22,7 +22,7 @@ class NFastCgi : public QObject
 {
     Q_OBJECT
   public:
-    explicit NFastCgi(const char *socketPath, int serviceMetaType, QObject *parent = 0);
+    explicit NFastCgi(const char *socketPath, int serviceMetaType, int threadCount, QObject *parent = 0);
 
   private:
     QSocketNotifier* m_notifier;
