@@ -1,1 +1,13 @@
 qtfjsonrpc.pro.user
+*.o
+*.so*
+debian/files
+Makefile*
+debian/libqtfjsonrpc0*
+debian/qtfjsonrpc-dev*
+debian/stamp*
+debian/tmp*
+moc_*
+example/qtfjsonrpc-example
+
+
