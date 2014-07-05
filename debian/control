@@ -8,7 +8,7 @@ Standards-Version: 3.9.5
 Package: qtfjsonrpc-dev
 Architecture: any
 Section: libdevel
-Depends: qtfjsonrpc0 (= ${binary:Version}), ${misc:Depends}
+Depends: libqtfjsonrpc0 (= ${binary:Version}), ${misc:Depends}
 Description: JsonRpc via fastcgi library for Qt5
  Header files for development
 
