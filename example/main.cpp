@@ -18,6 +18,6 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    NFastCgi fastCgi(":9000", qRegisterMetaType<TestService>(), &a);
+    NFastCgi fastCgi(":9000", qRegisterMetaType<TestService>(), 32, &a);
     return a.exec();
 }
