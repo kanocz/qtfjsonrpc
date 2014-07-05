@@ -19,7 +19,7 @@ class NNamedService : public QObject
     friend class NFastCgiJob;
     Q_OBJECT
 public:
-    explicit NNamedService(QObject *parent = 0);
+    explicit NNamedService(QObject *parent = 0) : QObject(parent) {}
     QVariant process(QString method, QVariantList arguments);
 
 signals:

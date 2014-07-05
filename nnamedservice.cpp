@@ -7,27 +7,25 @@
 
 #include <QMetaMethod>
 
-NNamedService::NNamedService(QObject *parent) :
-    QObject(parent)
-{
-//    metaInfoParsed = false;
-}
-
 void NNamedService::parseMetaInfo()
 {
     metaInfoParsed = true;
-    // получаем мета-объект
+    // get meta-object
     const QMetaObject *meta = metaObject();
-    // нам не нужны вызовы обхектов из QObject
+    // ignoring methods of QObject and so on
     for (int id = QObject::staticMetaObject.methodCount(); id < meta->methodCount(); ++id) {
         const QMetaMethod method = meta->method(id);
-        if (method.methodType() == QMetaMethod::Slot &&
-            method.access() == QMetaMethod::Public) {
+        // we need only public slots (remove check to provide all methods)
+        if (method.methodType() == QMetaMethod::Slot && method.access() == QMetaMethod::Public) {
             m_methodHash.insert(method.name(), id);
 
+            // max 10 of int
             QList<int> paramTypes;
+
+            // first one is return type
             paramTypes << method.returnType();
 
+            // and then types of parameters
             for (int p = 0; p < method.parameterCount(); p++)
                 paramTypes << method.parameterType(p);
 
@@ -38,15 +36,19 @@ void NNamedService::parseMetaInfo()
 
 QVariant NNamedService::process(QString method, QVariantList arguments)
 {
+    // we can't do this in constructor, but have to check if parsed
     if (!metaInfoParsed)
         parseMetaInfo();
 
+    // check if such method is in our array
     QByteArray b_method = method.toLatin1();
     if (!m_methodHash.contains(b_method))
         throw NNamedServriceException(NNamedServriceException::code_methodNotFound, QString("Method '%1' not found").arg(method));
 
+
     int metaId = -1;
     QList<int> paramTypes;
+    // we need to get method not only by name, but also by parameters count - default parameters not accepted!
     QList<int> indexes = m_methodHash.values(b_method);
     foreach (int methodIndex, indexes) {
         paramTypes = m_paramHash.value(methodIndex);
@@ -56,6 +58,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
         }
     }
 
+    // error if not found
     if (metaId == -1)
         throw NNamedServriceException(NNamedServriceException::code_invalidParams);
 
@@ -78,19 +81,30 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
         int parameterType = paramTypes[i + 1];
         const QVariant &argument = arguments.at(i);
         if (!argument.isValid()) {
-            // pass in a default constructed parameter in this case
+            // in case if we unable to parse argument we pass default value
             void *value = QMetaType::create(parameterType);
             parameters.append(value);
             cleanup.insert(value, static_cast<QMetaType::Type>(parameterType));
         } else {
-            if (argument.userType() != parameterType &&
-                parameterType != QMetaType::QVariant &&
-                const_cast<QVariant*>(&argument)->canConvert(static_cast<QVariant::Type>(parameterType)))
-                const_cast<QVariant*>(&argument)->convert(static_cast<QVariant::Type>(parameterType));
-            parameters.append(const_cast<void *>(argument.constData()));
+            if (argument.userType() != parameterType && parameterType != QMetaType::QVariant) {
+                // check if we need convert argument
+                if (const_cast<QVariant*>(&argument)->canConvert(static_cast<QVariant::Type>(parameterType))) {
+                  const_cast<QVariant*>(&argument)->convert(static_cast<QVariant::Type>(parameterType));
+                  parameters.append(const_cast<void *>(argument.constData()));
+                } else {
+                    // default value if not
+                    void *value = QMetaType::create(parameterType);
+                    parameters.append(value);
+                    cleanup.insert(value, static_cast<QMetaType::Type>(parameterType));
+                }
+
+            } else {
+                parameters.append(const_cast<void *>(argument.constData()));
+            }
         }
     }
 
+    // invoking method...
     bool success =
         const_cast<NNamedService*>(this)->qt_metacall(QMetaObject::InvokeMetaMethod, metaId, parameters.data()) < 0;
     if (!success)
