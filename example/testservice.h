@@ -18,7 +18,7 @@ class TestService : public NNamedService
     TestService(const TestService &other) : NNamedService(other.parent()) { instance = other.instance;  }
     ~TestService() {}
 
-  public Q_SLOTS:
+  public slots:
     int speedTest() { return 0; }
     int test1() { qDebug() << "test1 called"; return 0; }
     int test2(const QString &first, int second) { qDebug() << "test 2 called with " << first << " and " << second; return 1; }
