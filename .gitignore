@@ -1,4 +1,4 @@
-qtfjsonrpc.pro.user
+*.pro.user
 *.o
 *.so*
 debian/files

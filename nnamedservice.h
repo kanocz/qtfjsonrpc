@@ -26,12 +26,11 @@ signals:
 
 public slots:
 
-private:
+protected:
     static bool metaInfoParsed;
     void parseMetaInfo();
     static QMultiHash<QByteArray, int> m_methodHash;
     static QHash<int, QList<int> > m_paramHash;
-protected:
     QMap<QString,QVariant> params;
 };
 

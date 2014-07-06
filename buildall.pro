@@ -1,3 +1,3 @@
 TEMPLATE=subdirs
-SUBDIRS=qtfjsonrpc.pro example
+SUBDIRS=qtfjsonrpc.pro tests example
 

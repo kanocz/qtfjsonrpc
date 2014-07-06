@@ -1,3 +1,10 @@
+qtfjsonrpc (0.1.1) network; urgency=medium
+
+  * Small bugfixed.
+  * Unit testing.
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sun, 06 Jul 2014 02:13:43 +0200
+
 qtfjsonrpc (0.1) network; urgency=medium
 
   * Initial debian package.
