@@ -111,56 +111,9 @@ void NFastCgiJob::run()
 
         // у нас уже есть данные, теперь можно попробовать распарсить jsonrpc-запрос
 
-        QJsonParseError json_error;
-        json_request = QJsonDocument::fromJson(QByteArray(post_data, len), &json_error);
-        if (json_error.error != QJsonParseError::NoError)
-            throw NNamedService::NSException(NNamedService::NSException::code_parseError);
+        QByteArray result = processRequest(QByteArray(post_data, len), FCGX_GetParam("REMOTE_ADDR", m_request->envp));
 
-        // далее имея json-документ необходимо проверить десяток условий верности запроса
-        if (!json_request.isObject())
-            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
-        QJsonObject json_root = json_request.object();
-
-        // нам нужен только jsonrpc версии 2.0
-        if ((!json_root.contains("jsonrpc")) || (json_root.value("jsonrpc").toString("") != "2.0"))
-            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
-
-        if ((!json_root.contains("method")) || (!json_root.value("method").isString()))
-            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
-
-        if ((!json_root.contains("params")) || (!json_root.value("params").isArray()))
-            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
-
-        if ((!json_root.contains("id")) || (!json_root.value("id").isString()))
-            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
-
-        // TODO: тут будет авторизация :)
-
-        // создание экземпляра класса сервиса
-        NNamedService *service = static_cast<NNamedService *>(QMetaType::create(m_serviceMetaType));
-
-        // а тут заполнение дополнительных данных!!!
-        request_ip = FCGX_GetParam("REMOTE_ADDR", m_request->envp);
-        if (request_ip) {
-            service->params["remote_ip"] = QVariant(QString(request_ip));
-        }
-
-        // подготовка класса для ответа
-        QVariantMap jresult;
-
-        // собственно вызов функции
-        jresult.insert("result", service->process(json_root.value("method").toString(), json_root.value("params").toArray().toVariantList()));
-
-        // чистка памяти
-        QMetaType::destroy(m_serviceMetaType, (void *) service);
-
-        // дополнительные параметры ответа
-        jresult.insert("jsonrpc", "2.0");
-        jresult.insert("id", json_root.value("id").toVariant());
-
-        QJsonDocument result(QJsonObject::fromVariantMap(jresult));
-
-        FCGX_PutS(result.toJson().data(), m_request->out);
+        FCGX_PutS(result.data(), m_request->out);
 
     } catch (NNamedService::NSException &e) {
         FCGX_FPrintF(m_request->out, getJsonError(&e));
@@ -168,4 +121,57 @@ void NFastCgiJob::run()
     }
     if (post_data) delete post_data;
     FCGX_Finish_r(m_request);
+}
+
+QByteArray NFastCgiJob::processRequest(QByteArray request, QString ip)
+{
+    QJsonParseError json_error;
+    json_request = QJsonDocument::fromJson(request, &json_error);
+    if (json_error.error != QJsonParseError::NoError)
+        throw NNamedService::NSException(NNamedService::NSException::code_parseError);
+
+    // далее имея json-документ необходимо проверить десяток условий верности запроса
+    if (!json_request.isObject())
+        throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
+    QJsonObject json_root = json_request.object();
+
+    // нам нужен только jsonrpc версии 2.0
+    if ((!json_root.contains("jsonrpc")) || (json_root.value("jsonrpc").toString("") != "2.0"))
+        throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
+
+    if ((!json_root.contains("method")) || (!json_root.value("method").isString()))
+        throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
+
+    if ((!json_root.contains("params")) || (!json_root.value("params").isArray()))
+        throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
+
+    if ((!json_root.contains("id")) || (!json_root.value("id").isString()))
+        throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
+
+    // TODO: тут будет авторизация :)
+
+    // создание экземпляра класса сервиса
+    NNamedService *service = static_cast<NNamedService *>(QMetaType::create(m_serviceMetaType));
+
+    // а тут заполнение дополнительных данных!!!
+    if (!ip.isEmpty()) {
+        service->params["remote_ip"] = ip;
+    }
+
+    // подготовка класса для ответа
+    QVariantMap jresult;
+
+    // собственно вызов функции
+    jresult.insert("result", service->process(json_root.value("method").toString(), json_root.value("params").toArray().toVariantList()));
+
+    // чистка памяти
+    QMetaType::destroy(m_serviceMetaType, (void *) service);
+
+    // дополнительные параметры ответа
+    jresult.insert("jsonrpc", "2.0");
+    jresult.insert("id", json_root.value("id").toVariant());
+
+    QJsonDocument result(QJsonObject::fromVariantMap(jresult));
+
+    return result.toJson();
 }

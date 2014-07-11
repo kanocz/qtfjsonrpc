@@ -43,7 +43,7 @@ class NFastCgiJob : public QRunnable
 
     const char *getJsonError(NNamedService::NSException *e);
 
-public:
+  public:
 
     char *request_ip;
 
@@ -52,6 +52,10 @@ public:
     NFastCgiJob(FCGX_Request *request, int serviceMetaType);
     ~NFastCgiJob();
     void run();
+
+  protected:
+
+    QByteArray processRequest(QByteArray request, QString ip);
 };
 
 
