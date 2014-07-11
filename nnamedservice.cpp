@@ -43,7 +43,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
     // check if such method is in our array
     QByteArray b_method = method.toLatin1();
     if (!m_methodHash.contains(b_method))
-        throw NNamedServriceException(NNamedServriceException::code_methodNotFound, QString("Method '%1' not found").arg(method));
+        throw NSException(NSException::code_methodNotFound, QString("Method '%1' not found").arg(method));
 
 
     int metaId = -1;
@@ -60,7 +60,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
 
     // error if not found
     if (metaId == -1)
-        throw NNamedServriceException(NNamedServriceException::code_invalidParams);
+        throw NSException(NSException::code_invalidParams);
 
     QVarLengthArray<void *, 10> parameters;
     parameters.reserve(paramTypes.count());
@@ -108,7 +108,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
     bool success =
         const_cast<NNamedService*>(this)->qt_metacall(QMetaObject::InvokeMetaMethod, metaId, parameters.data()) < 0;
     if (!success)
-        throw NNamedServriceException(NNamedServriceException::code_serverError, QString("process for method '%1' failed").arg(method));
+        throw NSException(NSException::code_serverError, QString("process for method '%1' failed").arg(method));
 
     // cleanup and result
     QVariant returnCopy(returnValue);

@@ -50,7 +50,7 @@ void NFastCgi::connectionPending(int socket)
     notifier->setEnabled(true);
 }
 
-const char *NFastCgiJob::getJsonError(NNamedServriceException *e)
+const char *NFastCgiJob::getJsonError(NNamedService::NSException *e)
 {
   int code = e->getCode();
   int id = e->getId();
@@ -58,12 +58,12 @@ const char *NFastCgiJob::getJsonError(NNamedServriceException *e)
 
   if (message.isEmpty()) {
       switch (code) {
-        case NNamedServriceException::code_parseError: message = "Parse error"; break;
-        case NNamedServriceException::code_invalidRequest: message = "Invalid Request"; break;
-        case NNamedServriceException::code_methodNotFound:message = "Method not found"; break;
-        case NNamedServriceException::code_invalidParams: message = "Invalid params"; break;
-        case NNamedServriceException::code_internalError: message = "Internal error"; break;
-        case NNamedServriceException::code_serverError: message = "Server error"; break;
+        case NNamedService::NSException::code_parseError: message = "Parse error"; break;
+        case NNamedService::NSException::code_invalidRequest: message = "Invalid Request"; break;
+        case NNamedService::NSException::code_methodNotFound:message = "Method not found"; break;
+        case NNamedService::NSException::code_invalidParams: message = "Invalid params"; break;
+        case NNamedService::NSException::code_internalError: message = "Internal error"; break;
+        case NNamedService::NSException::code_serverError: message = "Server error"; break;
         default: message = "unknown error";
       }
   }
@@ -100,39 +100,39 @@ void NFastCgiJob::run()
         if (contentLength != NULL) { len = strtol(contentLength, NULL, 10); }
 
         if ((len < 1) || (len > NFastCgiJob::MAX_REQUEST_SIZE))
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
 
         post_data = new char[len+1];
         if (!post_data)
-            throw NNamedServriceException(NNamedServriceException::code_serverError, QString("falied to alloc %1 bytes").arg(len));
+            throw NNamedService::NSException(NNamedService::NSException::code_serverError, QString("falied to alloc %1 bytes").arg(len));
 
         if(FCGX_GetStr(post_data, len, m_request->in) != len)
-            throw NNamedServriceException(NNamedServriceException::code_serverError, QString("falied to read %1 bytes").arg(len));
+            throw NNamedService::NSException(NNamedService::NSException::code_serverError, QString("falied to read %1 bytes").arg(len));
 
         // у нас уже есть данные, теперь можно попробовать распарсить jsonrpc-запрос
 
         QJsonParseError json_error;
         json_request = QJsonDocument::fromJson(QByteArray(post_data, len), &json_error);
         if (json_error.error != QJsonParseError::NoError)
-            throw NNamedServriceException(NNamedServriceException::code_parseError);
+            throw NNamedService::NSException(NNamedService::NSException::code_parseError);
 
         // далее имея json-документ необходимо проверить десяток условий верности запроса
         if (!json_request.isObject())
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
         QJsonObject json_root = json_request.object();
 
         // нам нужен только jsonrpc версии 2.0
         if ((!json_root.contains("jsonrpc")) || (json_root.value("jsonrpc").toString("") != "2.0"))
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
 
         if ((!json_root.contains("method")) || (!json_root.value("method").isString()))
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
 
         if ((!json_root.contains("params")) || (!json_root.value("params").isArray()))
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
 
         if ((!json_root.contains("id")) || (!json_root.value("id").isString()))
-            throw NNamedServriceException(NNamedServriceException::code_invalidRequest);
+            throw NNamedService::NSException(NNamedService::NSException::code_invalidRequest);
 
         // TODO: тут будет авторизация :)
 
@@ -162,7 +162,7 @@ void NFastCgiJob::run()
 
         FCGX_PutS(result.toJson().data(), m_request->out);
 
-    } catch (NNamedServriceException &e) {
+    } catch (NNamedService::NSException &e) {
         FCGX_FPrintF(m_request->out, getJsonError(&e));
         qDebug() << "NFastCgiJob::run() -> " << getJsonError(&e);
     }

@@ -41,7 +41,7 @@ class NFastCgiJob : public QRunnable
 
     static const int MAX_REQUEST_SIZE = 16 * 1024 * 1024;
 
-    const char *getJsonError(NNamedServriceException *e);
+    const char *getJsonError(NNamedService::NSException *e);
 
 public:
 
