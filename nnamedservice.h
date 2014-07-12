@@ -22,6 +22,8 @@ public:
     explicit NNamedService(QObject *parent = 0) : QObject(parent) {}
     QVariant process(QString method, QVariantList arguments);
 
+    QMap<QString,QVariant> params;
+
     class NSException : public QException
     {
       protected:
@@ -57,7 +59,6 @@ protected:
     void parseMetaInfo();
     static QMultiHash<QByteArray, int> m_methodHash;
     static QHash<int, QList<int> > m_paramHash;
-    QMap<QString,QVariant> params;
 };
 
 

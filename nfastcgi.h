@@ -15,6 +15,7 @@
 #include <QException>
 
 #include "nnamedservice.h"
+#include "qjsonrpcserivce.h"
 
 class QSocketNotifier;
 
@@ -43,19 +44,13 @@ class NFastCgiJob : public QRunnable
 
     const char *getJsonError(NNamedService::NSException *e);
 
+    QJsonRpcSerivce *rpc;
+
   public:
-
-    char *request_ip;
-
-    QJsonDocument json_request;
 
     NFastCgiJob(FCGX_Request *request, int serviceMetaType);
     ~NFastCgiJob();
     void run();
-
-  protected:
-
-    QByteArray processRequest(QByteArray request, QString ip);
 };
 
 

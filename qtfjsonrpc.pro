@@ -10,11 +10,13 @@ TEMPLATE = lib
 INCLUDEPATH += /usr/include
 
 SOURCES += nfastcgi.cpp \
-    nnamedservice.cpp
+    nnamedservice.cpp \
+    qjsonrpcserivce.cpp
 
 HEADERS += \
     nfastcgi.h \
-    nnamedservice.h
+    nnamedservice.h \
+    qjsonrpcserivce.h
 
 LIBS += -lfcgi
 
