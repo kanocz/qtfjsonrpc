@@ -12,6 +12,7 @@
 #include <QMap>
 #include <QVariant>
 #include <QException>
+#include <QLoggingCategory>
 
 class NNamedService : public QObject
 {
@@ -61,5 +62,6 @@ protected:
     static QHash<int, QList<int> > m_paramHash;
 };
 
+Q_DECLARE_LOGGING_CATEGORY(LOG_NNAMEDSERVICE)
 
 #endif // NNAMEDSERVICE_H

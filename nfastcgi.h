@@ -13,6 +13,7 @@
 #include <QMetaType>
 #include <fcgiapp.h>
 #include <QException>
+#include <QLoggingCategory>
 
 #include "nnamedservice.h"
 #include "qjsonrpcserivce.h"
@@ -53,5 +54,6 @@ class NFastCgiJob : public QRunnable
     void run();
 };
 
+Q_DECLARE_LOGGING_CATEGORY(LOG_NFASTCGI)
 
 #endif // NFASTCGI_H

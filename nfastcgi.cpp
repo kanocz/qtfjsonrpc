@@ -12,19 +12,24 @@
 
 #include "nfastcgi.h"
 
+Q_LOGGING_CATEGORY(LOG_NFASTCGI, "NFastCgi")
+
 NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, int threadCount = 0, QObject *parent) : QObject(parent), m_notifier(0), m_serviceMetaType(serviceMetaType)
 {
     // инициализация метаданных до создания потоков, чтобы потом не повредить данные
+    qCDebug(LOG_NFASTCGI) << "NNamedService init";
     NNamedService *serviceInit = static_cast<NNamedService *>(QMetaType::create(m_serviceMetaType));
     Q_CHECK_PTR(serviceInit);
     serviceInit->parseMetaInfo();
     QMetaType::destroy(m_serviceMetaType, (void *) serviceInit);
 
     // создание пула потоков
+    qCDebug(LOG_NFASTCGI) << "QThreadPool init";
     jobsPool = new QThreadPool(this);
     jobsPool->setMaxThreadCount(threadCount == 0 ? QThread::idealThreadCount() : threadCount);
 
     // инициализаяиц fastcgi и подключения сигнала к сокету
+    qCDebug(LOG_NFASTCGI) << "FastCGI init";
     FCGX_Init();
     int sock = FCGX_OpenSocket(socketPath, 1024);
     this->m_notifier = new QSocketNotifier(sock, QSocketNotifier::Read);
@@ -33,6 +38,7 @@ NFastCgi::NFastCgi(const char *socketPath, int serviceMetaType, int threadCount 
 
 void NFastCgi::connectionPending(int socket)
 {
+    qCDebug(LOG_NFASTCGI) << "connectionPending";
     QSocketNotifier* notifier = qobject_cast<QSocketNotifier*>(this->sender());
     Q_CHECK_PTR(notifier);
 
@@ -44,6 +50,7 @@ void NFastCgi::connectionPending(int socket)
     if (s >= 0) {
         /* Здесь создаём и запускаем поток */
         NFastCgiJob *newJob = new NFastCgiJob(req, m_serviceMetaType);
+        qCDebug(LOG_NFASTCGI) << "New thread" << newJob;
         jobsPool->start(newJob);
     }
 
@@ -124,7 +131,7 @@ void NFastCgiJob::run()
 
     } catch (NNamedService::NSException &e) {
         FCGX_FPrintF(m_request->out, getJsonError(&e));
-        qDebug() << "NFastCgiJob::run() -> " << getJsonError(&e);
+        qCWarning(LOG_NFASTCGI) << "NFastCgiJob::run() -> " << getJsonError(&e);
     }
     if (post_data) delete post_data;
     FCGX_Finish_r(m_request);

@@ -3,6 +3,7 @@
 
 #include <QVariantMap>
 #include <QByteArray>
+#include <QLoggingCategory>
 
 class QJsonRpcSerivce
 {
@@ -15,5 +16,7 @@ private:
     int m_serviceMetaType;
 
 };
+
+Q_DECLARE_LOGGING_CATEGORY(LOG_QJSONRPCSERVICE)
 
 #endif // QJSONRPCSERIVCE_H

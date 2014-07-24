@@ -6,6 +6,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
+Q_LOGGING_CATEGORY(LOG_QJSONRPCSERVICE, "QJsonRpcService")
+
 QJsonRpcSerivce::QJsonRpcSerivce(int serviceMetaType) :
     m_serviceMetaType(serviceMetaType)
 {
@@ -13,10 +15,13 @@ QJsonRpcSerivce::QJsonRpcSerivce(int serviceMetaType) :
 
 QByteArray QJsonRpcSerivce::processRequest(QByteArray request, QVariantMap info)
 {
+    qCDebug(LOG_QJSONRPCSERVICE) << "processRequest" << QString(request) << info;
     QJsonParseError json_error;
     QJsonDocument json_request = QJsonDocument::fromJson(request, &json_error);
     if (json_error.error != QJsonParseError::NoError)
         throw NNamedService::NSException(NNamedService::NSException::code_parseError);
+
+    qCDebug(LOG_QJSONRPCSERVICE) << json_request;
 
     // далее имея json-документ необходимо проверить десяток условий верности запроса
     if (!json_request.isObject())
@@ -59,6 +64,8 @@ QByteArray QJsonRpcSerivce::processRequest(QByteArray request, QVariantMap info)
     jresult.insert("id", json_root.value("id").toVariant());
 
     QJsonDocument result(QJsonObject::fromVariantMap(jresult));
+
+    qCDebug(LOG_QJSONRPCSERVICE) << result;
 
     return result.toJson();
 }

@@ -7,8 +7,11 @@
 
 #include <QMetaMethod>
 
+Q_LOGGING_CATEGORY(LOG_NNAMEDSERVICE, "NNamedService")
+
 void NNamedService::parseMetaInfo()
 {
+    qCDebug(LOG_NNAMEDSERVICE) << "parseMetaInfo";
     metaInfoParsed = true;
     // get meta-object
     const QMetaObject *meta = metaObject();
@@ -36,6 +39,7 @@ void NNamedService::parseMetaInfo()
 
 QVariant NNamedService::process(QString method, QVariantList arguments)
 {
+    qCDebug(LOG_NNAMEDSERVICE) << "process" << method << arguments;
     // we can't do this in constructor, but have to check if parsed
     if (!metaInfoParsed)
         parseMetaInfo();
@@ -92,6 +96,7 @@ QVariant NNamedService::process(QString method, QVariantList arguments)
                   const_cast<QVariant*>(&argument)->convert(static_cast<QVariant::Type>(parameterType));
                   parameters.append(const_cast<void *>(argument.constData()));
                 } else {
+                    qCDebug(LOG_NNAMEDSERVICE) << "argument can't be converted";
                     // default value if not
                     void *value = QMetaType::create(parameterType);
                     parameters.append(value);
