@@ -1,3 +1,9 @@
+qtfjsonrpc (0.1.2) network; urgency=medium
+
+  * Tests fixed.
+
+ -- Anton Skorokhod <anton@nsl.cz>  Sat, 26 Jul 2014 01:37:01 +0200
+
 qtfjsonrpc (0.1.1) network; urgency=medium
 
   * Small bugfixed.

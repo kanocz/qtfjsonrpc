@@ -16,7 +16,7 @@ SOURCES += main.cpp \
 HEADERS += \
     test_nnamedservice.h
 
-tests.extra = @./tests
+tests.extra = @ LD_LIBRARY_PATH=.. ./tests
 tests.path = /tmp
 
 INSTALLS += tests
