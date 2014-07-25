@@ -65,10 +65,10 @@ void Test_NNamedService::exceptions()
     bool hasException;
 
     hasException = false;
-    try { test.process("invalid", QVariantList()); } catch (NNamedServriceException &e) { QCOMPARE(e.getCode(), -32601); hasException = true; }
+    try { test.process("invalid", QVariantList()); } catch (NNamedService::NSException &e) { QCOMPARE(e.getCode(), -32601); hasException = true; }
     QVERIFY2(hasException, "No 32601 exception");
 
     hasException = false;
-    try { test.process("return1", QVariantList() << 1); } catch (NNamedServriceException &e) { QCOMPARE(e.getCode(), -32602); hasException = true; }
+    try { test.process("return1", QVariantList() << 1); } catch (NNamedService::NSException &e) { QCOMPARE(e.getCode(), -32602); hasException = true; }
     QVERIFY2(hasException, "No 32602 exception");
 }
